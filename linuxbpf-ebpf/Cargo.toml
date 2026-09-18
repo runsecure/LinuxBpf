@@ -1,0 +1,22 @@
+[package]
+name = "linuxbpf-ebpf"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+linuxbpf-common = { path = "../linuxbpf-common" }
+
+aya-ebpf = { workspace = true }
+network-types = { workspace = true }
+
+[[bin]]
+name = "linuxbpf"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+panic = "abort"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
