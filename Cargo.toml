@@ -1,0 +1,33 @@
+[workspace]
+resolver = "2"
+members = [
+    "linuxbpf",
+    "linuxbpf-common",
+    "linuxbpf-ebpf",
+]
+default-members = ["linuxbpf", "linuxbpf-common"]
+
+[workspace.package]
+license = "MIT OR Apache-2.0"
+edition = "2024"
+
+[workspace.dependencies]
+aya = { version = "0.14.0", default-features = false }
+aya-build = { version = "0.2.0", default-features = false }
+aya-ebpf = { version = "0.2.1", default-features = false }
+anyhow = { version = "1", default-features = false }
+cargo_metadata = { version = "0.23.0", default-features = false }
+clap = { version = "4.5.20", default-features = false, features = ["std", "derive"] }
+libc = { version = "0.2.159", default-features = false }
+network-types = { version = "0.2.0", default-features = false }
+serde = { version = "1", default-features = false }
+tokio = { version = "1.40.0", default-features = false }
+toml = { version = "0.8", default-features = false }
+tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false }
+tracing-journald = { version = "0.3", default-features = false }
+
+[profile.release.package.linuxbpf-ebpf]
+debug = 2
+codegen-units = 1
+strip = false

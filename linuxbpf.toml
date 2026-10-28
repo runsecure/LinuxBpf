@@ -1,0 +1,49 @@
+# Example boundary-protection allowlist for `linuxbpf`.
+#
+# Everything not matched by a rule below is denied by default -- this is an
+# allowlist, not a blocklist. See README.md for the full field reference.
+#
+# [[*.url]] (hostname/SNI) entries are parsed but currently rejected at load
+# time -- they're not enforceable with this filter's design (stateless,
+# per-packet, no connection tracking). See README.md and
+# linuxbpf-ebpf/src/filter.rs for why, and what's needed to bring them back.
+
+[global]
+# "enforce": denied packets are actually dropped.
+# "monitor": verdicts are computed and logged exactly as in enforce mode,
+#            but nothing is ever actually dropped -- use this first to see
+#            what a candidate allowlist would have blocked before cutting
+#            over to enforcement.
+mode = "monitor"
+
+# Optional: the cgroup v2 directory to attach to. If omitted, the loader
+# auto-detects the unified cgroup2 mount visible to this process (see
+# `cgroup.rs`). Point this at a specific container's cgroup to scope
+# enforcement to just it, e.g.:
+# cgroup_path = "/sys/fs/cgroup/system.slice/docker-<container-id>.scope"
+
+# ---------------------------------------------------------------------------
+# Ingress: traffic arriving at sockets inside the attached cgroup.
+# IP/subnet rules match the remote peer's source address.
+# ---------------------------------------------------------------------------
+
+[[ingress.ip]]
+address = "203.0.113.10"
+description = "known partner API caller"
+
+[[ingress.subnet]]
+cidr = "10.0.0.0/8"
+description = "internal network"
+
+# ---------------------------------------------------------------------------
+# Egress: traffic sockets inside the attached cgroup are about to send.
+# IP/subnet rules match the remote peer's destination address.
+# ---------------------------------------------------------------------------
+
+[[egress.ip]]
+address = "1.1.1.1"
+description = "Cloudflare DNS"
+
+[[egress.subnet]]
+cidr = "172.16.0.0/12"
+description = "internal network"
